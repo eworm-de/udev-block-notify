@@ -12,7 +12,6 @@
 
 #include <libnotify/notify.h>
 #include <libudev.h>
-#include <blkid.h>
 
 #define PROGNAME	"udev-block-notify"
 
@@ -36,15 +35,12 @@
 #define TEXT_TAG	"%s\n%s: <i>%s</i>"
 
 int main (int argc, char ** argv) {
-	blkid_cache cache = NULL;
-	blkid_dev blkdev = NULL;
-	blkid_tag_iterate iter = NULL;
 	char action;
-	char *device = NULL, *icon = NULL, *notifystr = NULL, *read = NULL;
-	const char *type, *value, *devname;
+	char *device = NULL, *icon = NULL, *notifystr = NULL;
+	const char *value;
 	fd_set readfds;
 	GError *error = NULL;
-	int fdcount, devnum, errcount = 0;
+	int devnum, errcount = 0;
         NotifyNotification *notification;
         NotifyNotification ***notificationref;
 	struct udev_device *dev = NULL;
@@ -82,7 +78,7 @@ int main (int argc, char ** argv) {
                 if (mon != NULL)
                         FD_SET(udev_monitor_get_fd(mon), &readfds);
 
-                fdcount = select(udev_monitor_get_fd(mon) + 1, &readfds, NULL, NULL, NULL);
+                select(udev_monitor_get_fd(mon) + 1, &readfds, NULL, NULL, NULL);
 
                 if ((mon != NULL) && FD_ISSET(udev_monitor_get_fd(mon), &readfds)) {
 			dev = udev_monitor_receive_device(mon);
@@ -125,27 +121,35 @@ int main (int argc, char ** argv) {
 						icon = ICON_DEFAULT;
 				}
 
-				if (blkid_get_cache(&cache, read) != 0)
-					fprintf(stderr, "%s: Could not get blkid cache.\n", argv[0]);
-
-				if (blkid_probe_all_new(cache) != 0)
-					fprintf(stderr, "%s: Could not probe new devices.\n", argv[0]);
-
 				if (action != 'r') {
-					blkdev = blkid_get_dev(cache, udev_device_get_devnode(dev), BLKID_DEV_NORMAL);
-			
-					if (blkdev) {
-						iter = blkid_tag_iterate_begin(blkdev);
-				
-						while (blkid_tag_next(iter, &type, &value) == 0) {
-							notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + strlen(type) + strlen(value));
-							sprintf(notifystr, TEXT_TAG, notifystr, type, value);
-						}
-	
-						blkid_tag_iterate_end(iter);
-						blkid_put_cache(cache);
-					} else
-						fprintf(stderr, "%s: Could not get blkid device.\n", argv[0]);
+					if ((value = udev_device_get_property_value(dev, "ID_FS_LABEL")) != NULL) {
+						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 5 + strlen(value));
+						sprintf(notifystr, TEXT_TAG, notifystr, "Label", value);
+					}
+					if ((value = udev_device_get_property_value(dev, "ID_FS_TYPE")) != NULL) {
+						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 4 + strlen(value));
+						sprintf(notifystr, TEXT_TAG, notifystr, "Type", value);
+					}
+					if ((value = udev_device_get_property_value(dev, "ID_FS_USAGE")) != NULL) {
+						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 5 + strlen(value));
+						sprintf(notifystr, TEXT_TAG, notifystr, "Usage", value);
+					}
+					if ((value = udev_device_get_property_value(dev, "ID_FS_UUID")) != NULL) {
+						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 4 + strlen(value));
+						sprintf(notifystr, TEXT_TAG, notifystr, "UUID", value);
+					}
+					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_TYPE")) != NULL) {
+						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
+						sprintf(notifystr, TEXT_TAG, notifystr, "Partition Type", value);
+					}
+					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_NAME")) != NULL) {
+						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
+						sprintf(notifystr, TEXT_TAG, notifystr, "Partition Name", value);
+					}
+					if ((value = udev_device_get_property_value(dev, "ID_PART_ENTRY_TYPE")) != NULL) {
+						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
+						sprintf(notifystr, TEXT_TAG, notifystr, "Partition UUID", value);
+					}
 				}
 
 #if DEBUG

@@ -2,7 +2,6 @@
 
 CC	:= gcc
 CFLAGS	+= $(shell pkg-config --cflags --libs libudev) \
-	   $(shell pkg-config --cflags --libs blkid) \
 	   $(shell pkg-config --cflags --libs libnotify)
 VERSION	= $(shell git describe --tags --long)
 
