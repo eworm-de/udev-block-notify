@@ -32,12 +32,12 @@
 #define TEXT_MOVE	"Device <b>%s</b> (%i:%i) was <b>renamed</b>."
 #define TEXT_CHANGE	"Device <b>%s</b> (%i:%i) media <b>changed</b>."
 #define TEXT_DEFAULT	"Anything happend to <b>%s</b> (%i:%i)... Don't know."
-#define TEXT_TAG	"%s\n%s: <i>%s</i>"
+#define TEXT_TAG	"\n%s: <i>%s</i>"
 
 int main (int argc, char ** argv) {
 	char action;
 	char *device = NULL, *icon = NULL, *notifystr = NULL;
-	const char *value;
+	const char *value = NULL;
 	fd_set readfds;
 	GError *error = NULL;
 	int devnum, errcount = 0;
@@ -66,7 +66,7 @@ int main (int argc, char ** argv) {
 	udev_monitor_filter_add_match_subsystem_devtype(mon, "block", NULL);
 	udev_monitor_enable_receiving(mon);
 
-	notificationref = malloc(256 * sizeof(size_t));
+	notificationref = malloc(256 * sizeof(NotifyNotification));
 	for(i = 0; i < 256; i++)
 		notificationref[i] = NULL;
 	maxminor = malloc(256 * sizeof(short int));
@@ -92,63 +92,63 @@ int main (int argc, char ** argv) {
 				switch(action) {
 					case 'a':
 						// a: add
-						notifystr = (char *) malloc(strlen(TEXT_ADD) + strlen(device));
+						notifystr = malloc(strlen(TEXT_ADD) + strlen(device) + 5);
 						sprintf(notifystr, TEXT_ADD, device, major, minor);
 						icon = ICON_ADD;
 						break;
 					case 'r':
 						// r: remove
-						notifystr = (char *) malloc(strlen(TEXT_REMOVE) + strlen(device));
+						notifystr = malloc(strlen(TEXT_REMOVE) + strlen(device) + 5);
 						sprintf(notifystr, TEXT_REMOVE, device, major, minor);
 						icon = ICON_REMOVE;
 						break;
 					case 'm':
 						// m: move
-						notifystr = (char *) malloc(strlen(TEXT_MOVE) + strlen(device));
+						notifystr = malloc(strlen(TEXT_MOVE) + strlen(device) + 5);
 						sprintf(notifystr, TEXT_MOVE, device, major, minor);
 						icon = ICON_MOVE;
 						break;
 					case 'c':
 						// c: change
-						notifystr = (char *) malloc(strlen(TEXT_CHANGE) + strlen(device));
+						notifystr = malloc(strlen(TEXT_CHANGE) + strlen(device) + 5);
 						sprintf(notifystr, TEXT_CHANGE, device, major, minor);
 						icon = ICON_CHANGE;
 						break;
 					default:
 						// we should never get here I think...
-						notifystr = (char *) malloc(strlen(TEXT_DEFAULT) + strlen(device));
+						notifystr = malloc(strlen(TEXT_DEFAULT) + strlen(device) + 5);
 						sprintf(notifystr, TEXT_CHANGE, device, major, minor);
 						icon = ICON_DEFAULT;
 				}
 
 				if (action != 'r') {
 					if ((value = udev_device_get_property_value(dev, "ID_FS_LABEL")) != NULL) {
-						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 5 + strlen(value));
-						sprintf(notifystr, TEXT_TAG, notifystr, "Label", value);
+						notifystr = realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 5 + strlen(value));
+						sprintf(notifystr + strlen(notifystr), TEXT_TAG, "Label", value);
 					}
 					if ((value = udev_device_get_property_value(dev, "ID_FS_TYPE")) != NULL) {
-						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 4 + strlen(value));
-						sprintf(notifystr, TEXT_TAG, notifystr, "Type", value);
+						notifystr = realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 4 + strlen(value));
+						sprintf(notifystr + strlen(notifystr), TEXT_TAG, "Type", value);
 					}
 					if ((value = udev_device_get_property_value(dev, "ID_FS_USAGE")) != NULL) {
-						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 5 + strlen(value));
-						sprintf(notifystr, TEXT_TAG, notifystr, "Usage", value);
+						notifystr = realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 5 + strlen(value));
+						sprintf(notifystr + strlen(notifystr), TEXT_TAG, "Usage", value);
 					}
 					if ((value = udev_device_get_property_value(dev, "ID_FS_UUID")) != NULL) {
-						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 4 + strlen(value));
-						sprintf(notifystr, TEXT_TAG, notifystr, "UUID", value);
+						notifystr = realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 4 + strlen(value));
+						sprintf(notifystr + strlen(notifystr), TEXT_TAG, "UUID", value);
 					}
 					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_TYPE")) != NULL) {
-						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
-						sprintf(notifystr, TEXT_TAG, notifystr, "Partition Type", value);
+						notifystr = realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
+						sprintf(notifystr + strlen(notifystr), TEXT_TAG, "Partition Type", value);
 					}
 					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_NAME")) != NULL) {
-						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
-						sprintf(notifystr, TEXT_TAG, notifystr, "Partition Name", value);
+						notifystr = realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
+						sprintf(notifystr + strlen(notifystr), TEXT_TAG, "Partition Name", value);
 					}
 					if ((value = udev_device_get_property_value(dev, "ID_PART_ENTRY_TYPE")) != NULL) {
-						notifystr = (char *) realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
-						sprintf(notifystr, TEXT_TAG, notifystr, "Partition UUID", value);
+						notifystr = realloc(notifystr, strlen(TEXT_TAG) + strlen(notifystr) + 14 + strlen(value));
+						sprintf(notifystr + strlen(notifystr), TEXT_TAG, "Partition UUID", value);
 					}
 				}
 
