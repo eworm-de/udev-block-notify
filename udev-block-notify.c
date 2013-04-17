@@ -140,11 +140,11 @@ int main (int argc, char ** argv) {
 					if ((value = udev_device_get_property_value(dev, "ID_FS_UUID")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "UUID", value);
 					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_TYPE")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Type", value);
+						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Table Type", value);
 					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_NAME")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Name", value);
 					if ((value = udev_device_get_property_value(dev, "ID_PART_ENTRY_TYPE")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Partition UUID", value);
+						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Type", value);
 				}
 
 #if DEBUG
