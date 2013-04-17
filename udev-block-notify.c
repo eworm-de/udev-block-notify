@@ -34,7 +34,9 @@
 #define TEXT_DEFAULT	"Anything happend to <b>%s</b> (%i:%i)... Don't know."
 #define TEXT_TAG	"\n%s: <i>%s</i>"
 
-char * newstr(char *text, char *notifystr, char *device, unsigned short int major, unsigned short int minor) {
+char * newstr(char *text, char *device, unsigned short int major, unsigned short int minor) {
+	char *notifystr;
+
 	notifystr = malloc(strlen(text) + strlen(device) + 10 /* max string length 2* unsigned short int */);
 	sprintf(notifystr, text, device, major, minor);
 
@@ -106,27 +108,27 @@ int main (int argc, char ** argv) {
 				switch(action) {
 					case 'a':
 						// a: add
-						notifystr = newstr(TEXT_ADD, notifystr, device, major, minor);
+						notifystr = newstr(TEXT_ADD, device, major, minor);
 						icon = ICON_ADD;
 						break;
 					case 'r':
 						// r: remove
-						notifystr = newstr(TEXT_REMOVE, notifystr, device, major, minor);
+						notifystr = newstr(TEXT_REMOVE, device, major, minor);
 						icon = ICON_REMOVE;
 						break;
 					case 'm':
 						// m: move
-						notifystr = newstr(TEXT_MOVE, notifystr, device, major, minor);
+						notifystr = newstr(TEXT_MOVE, device, major, minor);
 						icon = ICON_MOVE;
 						break;
 					case 'c':
 						// c: change
-						notifystr = newstr(TEXT_CHANGE, notifystr, device, major, minor);
+						notifystr = newstr(TEXT_CHANGE, device, major, minor);
 						icon = ICON_CHANGE;
 						break;
 					default:
 						// we should never get here I think...
-						notifystr = newstr(TEXT_DEFAULT, notifystr, device, major, minor);
+						notifystr = newstr(TEXT_DEFAULT, device, major, minor);
 						icon = ICON_DEFAULT;
 				}
 
