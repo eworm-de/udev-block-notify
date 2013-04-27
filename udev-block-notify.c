@@ -161,6 +161,9 @@ int main (int argc, char ** argv) {
 					
 				if (notificationref[major][minor] == NULL) {
 					notification = notify_notification_new(TEXT_TOPIC, notifystr, icon);
+					notify_notification_set_category(notification, PROGNAME);
+					notify_notification_set_urgency (notification, NOTIFY_URGENCY_NORMAL);
+
 					notificationref[major][minor] = notification;
 				} else {
 					notification = notificationref[major][minor];
@@ -168,8 +171,6 @@ int main (int argc, char ** argv) {
 				}
 
 			        notify_notification_set_timeout(notification, NOTIFICATION_TIMEOUT);
-				notify_notification_set_category(notification, PROGNAME);
-				notify_notification_set_urgency (notification, NOTIFY_URGENCY_NORMAL);
 	
 				while(!notify_notification_show(notification, &error)) {
 					if (errcount > 1) {
