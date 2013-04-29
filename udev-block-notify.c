@@ -34,6 +34,7 @@
 #define TEXT_DEFAULT	"Anything happend to <b>%s</b> (%i:%i)... Don't know."
 #define TEXT_TAG	"\n%s: <i>%s</i>"
 
+/* newstr */
 char * newstr(char *text, char *device, unsigned short int major, unsigned short int minor) {
 	char *notifystr;
 
@@ -43,6 +44,7 @@ char * newstr(char *text, char *device, unsigned short int major, unsigned short
 	return notifystr;
 }
 
+/* appendstr */
 char * appendstr(char *text, char *notifystr, char *property, const char *value) {
 	notifystr = realloc(notifystr, strlen(text) + strlen(notifystr) + strlen(property) + strlen(value));
 	sprintf(notifystr + strlen(notifystr), text, property, value);
@@ -50,6 +52,7 @@ char * appendstr(char *text, char *notifystr, char *property, const char *value)
 	return notifystr;
 }
 
+/* main */
 int main (int argc, char ** argv) {
 	char action;
 	char *device = NULL, *icon = NULL, *notifystr = NULL;
@@ -57,13 +60,11 @@ int main (int argc, char ** argv) {
 	fd_set readfds;
 	GError *error = NULL;
 	int devnum, errcount = 0;
-        NotifyNotification *notification;
-        NotifyNotification ***notificationref;
+	NotifyNotification ***notification;
 	struct udev_device *dev = NULL;
-   	struct udev_monitor *mon = NULL;
+	struct udev_monitor *mon = NULL;
 	struct udev *udev = NULL;
-	short int *maxminor;
-	unsigned short int i, major, minor;
+	unsigned short int i, j, major, minor;
 
 	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
 
@@ -82,21 +83,21 @@ int main (int argc, char ** argv) {
 	udev_monitor_filter_add_match_subsystem_devtype(mon, "block", NULL);
 	udev_monitor_enable_receiving(mon);
 
-	notificationref = malloc(256 * sizeof(NotifyNotification));
-	for(i = 0; i < 256; i++)
-		notificationref[i] = NULL;
-	maxminor = malloc(256 * sizeof(short int));
-	for(i = 0; i < 256; i++)
-		maxminor[i] = -1;
+	notification = malloc(256 * sizeof(NotifyNotification));
+	for(i = 0; i < 256; i++) {
+		notification[i] = malloc(256 * sizeof(NotifyNotification));
+		for(j = 0; j < 256; j++)
+			notification[i][j] = NULL;
+	}
 
 	while (1) {
-                FD_ZERO(&readfds);
-                if (mon != NULL)
-                        FD_SET(udev_monitor_get_fd(mon), &readfds);
+		FD_ZERO(&readfds);
+		if (mon != NULL)
+			FD_SET(udev_monitor_get_fd(mon), &readfds);
 
-                select(udev_monitor_get_fd(mon) + 1, &readfds, NULL, NULL, NULL);
+		select(udev_monitor_get_fd(mon) + 1, &readfds, NULL, NULL, NULL);
 
-                if ((mon != NULL) && FD_ISSET(udev_monitor_get_fd(mon), &readfds)) {
+		if ((mon != NULL) && FD_ISSET(udev_monitor_get_fd(mon), &readfds)) {
 			dev = udev_monitor_receive_device(mon);
 			if(dev) {
 				device = (char *) udev_device_get_sysname(dev);
@@ -153,26 +154,16 @@ int main (int argc, char ** argv) {
 				printf("%s: %s\n", argv[0], notifystr);
 #endif
 
-				if (maxminor[major] < minor) {
-					notificationref[major] = realloc(notificationref[major], (minor + 1) * sizeof(size_t));
-			                while(maxminor[major] < minor)
-			                        notificationref[major][++maxminor[major]] = NULL;
-			        }
-					
-				if (notificationref[major][minor] == NULL) {
-					notification = notify_notification_new(TEXT_TOPIC, notifystr, icon);
-					notify_notification_set_category(notification, PROGNAME);
-					notify_notification_set_urgency (notification, NOTIFY_URGENCY_NORMAL);
+				if (notification[major][minor] == NULL) {
+					notification[major][minor] = notify_notification_new(TEXT_TOPIC, notifystr, icon);
+					notify_notification_set_category(notification[major][minor], PROGNAME);
+					notify_notification_set_urgency (notification[major][minor], NOTIFY_URGENCY_NORMAL);
+				} else
+					notify_notification_update(notification[major][minor], TEXT_TOPIC, notifystr, icon);
 
-					notificationref[major][minor] = notification;
-				} else {
-					notification = notificationref[major][minor];
-					notify_notification_update(notification, TEXT_TOPIC, notifystr, icon);
-				}
-
-			        notify_notification_set_timeout(notification, NOTIFICATION_TIMEOUT);
+				notify_notification_set_timeout(notification[major][minor], NOTIFICATION_TIMEOUT);
 	
-				while(!notify_notification_show(notification, &error)) {
+				while(!notify_notification_show(notification[major][minor], &error)) {
 					if (errcount > 1) {
 						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", argv[0]);
 						exit(EXIT_FAILURE);
