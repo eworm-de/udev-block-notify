@@ -66,7 +66,11 @@ int main (int argc, char ** argv) {
 	struct udev *udev = NULL;
 	unsigned short int i, j, major, minor;
 
-	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
+	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__
+#if DEBUG
+			", with debug output"
+#endif			
+	")\n", argv[0], PROGNAME, VERSION);
 
 	if(!notify_init("Udev-Block-Notification")) {
 		fprintf(stderr, "%s: Can't create notify.\n", argv[0]);
