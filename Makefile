@@ -1,6 +1,7 @@
 # udev-block-notify - Notify about udev block events
 
 CC	:= gcc
+CFLAGS	+= -O2 -Wall -Werror
 CFLAGS	+= $(shell pkg-config --cflags --libs libudev) \
 	   $(shell pkg-config --cflags --libs libnotify)
 VERSION	= $(shell git describe --tags --long)
