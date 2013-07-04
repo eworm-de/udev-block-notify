@@ -59,12 +59,14 @@ int main (int argc, char ** argv) {
 	const char *value = NULL;
 	fd_set readfds;
 	GError *error = NULL;
-	int devnum, errcount = 0;
-	NotifyNotification ***notification;
+	NotifyNotification ***notification = NULL;
+	int errcount = 0;
+	dev_t devnum = 0;
+	unsigned int major = 0, minor = 0, maxmajor = 0;
+	unsigned int *maxminor = NULL;
 	struct udev_device *dev = NULL;
 	struct udev_monitor *mon = NULL;
 	struct udev *udev = NULL;
-	unsigned short int i, j, major, minor;
 
 	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__
 #if DEBUG
@@ -87,13 +89,6 @@ int main (int argc, char ** argv) {
 	udev_monitor_filter_add_match_subsystem_devtype(mon, "block", NULL);
 	udev_monitor_enable_receiving(mon);
 
-	notification = malloc(256 * sizeof(NotifyNotification));
-	for(i = 0; i < 256; i++) {
-		notification[i] = malloc(256 * sizeof(NotifyNotification));
-		for(j = 0; j < 256; j++)
-			notification[i][j] = NULL;
-	}
-
 	while (1) {
 		FD_ZERO(&readfds);
 		if (mon != NULL)
@@ -106,8 +101,28 @@ int main (int argc, char ** argv) {
 			if(dev) {
 				device = (char *) udev_device_get_sysname(dev);
 				devnum = udev_device_get_devnum(dev);
-				major = devnum / 256;
-				minor = devnum - (major * 256);
+				major = major(devnum);
+				minor = minor(devnum);
+
+				/* make sure we have allocated memory */
+				if (maxmajor <= major) {
+					notification = realloc(notification, (major + 1) * sizeof(size_t));
+					maxminor = realloc(maxminor, (major + 1) * sizeof(unsigned int));
+					while (maxmajor <= major) {
+						notification[maxmajor] = NULL;
+						maxminor[maxmajor] = 0;
+						maxmajor++;
+					}
+					maxmajor--;
+				}
+				if (maxminor[major] <= minor) {
+					notification[major] = realloc(notification[major], (minor + 1) * sizeof(size_t));
+					while (maxminor[major] <= minor) {
+						notification[major][maxminor[major]] = NULL;
+						maxminor[major]++;
+					}
+					maxminor[major]--;
+				}
 
 				action = udev_device_get_action(dev)[0];
 				switch(action) {
