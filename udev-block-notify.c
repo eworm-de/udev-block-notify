@@ -105,7 +105,7 @@ int main (int argc, char ** argv) {
 				minor = minor(devnum);
 
 				/* make sure we have allocated memory */
-				if (maxmajor <= major) {
+				if (maxmajor < major) {
 					notification = realloc(notification, (major + 1) * sizeof(size_t));
 					maxminor = realloc(maxminor, (major + 1) * sizeof(unsigned int));
 					while (maxmajor <= major) {
@@ -115,7 +115,7 @@ int main (int argc, char ** argv) {
 					}
 					maxmajor--;
 				}
-				if (maxminor[major] <= minor) {
+				if (maxminor[major] < minor) {
 					notification[major] = realloc(notification[major], (minor + 1) * sizeof(size_t));
 					while (maxminor[major] <= minor) {
 						notification[major][maxminor[major]] = NULL;
