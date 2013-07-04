@@ -48,7 +48,7 @@ char * newstr(char *text, char *device, unsigned short int major, unsigned short
 char * appendstr(char *text, char *notifystr, char *property, const char *value) {
 	notifystr = realloc(notifystr, strlen(text) + strlen(notifystr) + strlen(property) + strlen(value));
 	sprintf(notifystr + strlen(notifystr), text, property, value);
-	
+
 	return notifystr;
 }
 
@@ -71,7 +71,7 @@ int main (int argc, char ** argv) {
 	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__
 #if DEBUG
 			", with debug output"
-#endif			
+#endif
 	")\n", argv[0], PROGNAME, VERSION);
 
 	if(!notify_init("Udev-Block-Notification")) {
@@ -181,7 +181,7 @@ int main (int argc, char ** argv) {
 					notify_notification_update(notification[major][minor], TEXT_TOPIC, notifystr, icon);
 
 				notify_notification_set_timeout(notification[major][minor], NOTIFICATION_TIMEOUT);
-	
+
 				while(!notify_notification_show(notification[major][minor], &error)) {
 					if (errcount > 1) {
 						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", argv[0]);
@@ -192,9 +192,9 @@ int main (int argc, char ** argv) {
 
 						g_error_free(error);
 						error = NULL;
-	
+
 						notify_uninit();
-						
+
 						usleep(500 * 1000);
 
 						if(!notify_init("Udev-Block-Notification")) {
@@ -204,11 +204,11 @@ int main (int argc, char ** argv) {
 					}
 				}
 				errcount = 0;
-	
+
 				free(notifystr);
 				udev_device_unref(dev);
 			}
-	
+
 			// This is not really needed... But we want to make shure not to eat 100% CPU if anything breaks. ;)
 			usleep(50 * 1000);
 		}
