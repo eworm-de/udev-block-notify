@@ -103,7 +103,9 @@ int main (int argc, char ** argv) {
 				devnum = udev_device_get_devnum(dev);
 				major = major(devnum);
 				minor = minor(devnum);
-
+#if DEBUG
+				printf("%s: Processing device %d:%d\n", argv[0], major, minor);
+#endif
 				/* make sure we have allocated memory */
 				if (maxmajor < major) {
 					notification = realloc(notification, (major + 1) * sizeof(size_t));
