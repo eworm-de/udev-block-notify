@@ -34,7 +34,34 @@
 #define TEXT_DEFAULT	"Anything happend to <b>%s</b> (%i:%i)... Don't know."
 #define TEXT_TAG	"\n%s: <i>%s</i>"
 
-/* newstr */
+struct notifications {
+	dev_t devnum;
+	NotifyNotification *notification;
+	struct notifications *next;
+};
+
+/*** get_notification ***/
+NotifyNotification * get_notification(struct notifications *notifications, dev_t devnum) {
+	while (notifications->next != NULL) {
+		if (notifications->next->devnum == devnum)
+			return notifications->next->notification;
+		notifications = notifications->next;
+	}
+
+	/* did not find the notification, creating a new struct element */
+	notifications->next = malloc(sizeof(struct notifications));
+	notifications = notifications->next;
+	notifications->devnum = devnum;
+	notifications->notification = notify_notification_new("", "", "");
+	notifications->next = NULL;
+
+	notify_notification_set_category(notifications->notification, PROGNAME);
+	notify_notification_set_urgency (notifications->notification, NOTIFY_URGENCY_NORMAL);
+
+	return notifications->notification;
+}
+
+/*** newstr ***/
 char * newstr(char *text, char *device, unsigned short int major, unsigned short int minor) {
 	char *notifystr;
 
@@ -44,7 +71,7 @@ char * newstr(char *text, char *device, unsigned short int major, unsigned short
 	return notifystr;
 }
 
-/* appendstr */
+/*** appendstr ***/
 char * appendstr(char *text, char *notifystr, char *property, const char *value) {
 	notifystr = realloc(notifystr, strlen(text) + strlen(notifystr) + strlen(property) + strlen(value));
 	sprintf(notifystr + strlen(notifystr), text, property, value);
@@ -59,11 +86,11 @@ int main (int argc, char ** argv) {
 	const char *value = NULL;
 	fd_set readfds;
 	GError *error = NULL;
-	NotifyNotification ***notification = NULL;
+	NotifyNotification *notification = NULL;
+	struct notifications *notifications = NULL;
 	int errcount = 0;
 	dev_t devnum = 0;
-	unsigned int major = 0, minor = 0, maxmajor = 0;
-	unsigned int *maxminor = NULL;
+	unsigned int major = 0, minor = 0;
 	struct udev_device *dev = NULL;
 	struct udev_monitor *mon = NULL;
 	struct udev *udev = NULL;
@@ -89,6 +116,11 @@ int main (int argc, char ** argv) {
 	udev_monitor_filter_add_match_subsystem_devtype(mon, "block", NULL);
 	udev_monitor_enable_receiving(mon);
 
+	notifications = malloc(sizeof(struct notifications));
+	notifications->devnum = 0;
+	notifications->notification = NULL;
+	notifications->next = NULL;
+
 	while (1) {
 		FD_ZERO(&readfds);
 		if (mon != NULL)
@@ -106,26 +138,6 @@ int main (int argc, char ** argv) {
 #if DEBUG
 				printf("%s: Processing device %d:%d\n", argv[0], major, minor);
 #endif
-				/* make sure we have allocated memory */
-				if (maxmajor < major) {
-					notification = realloc(notification, (major + 1) * sizeof(size_t));
-					maxminor = realloc(maxminor, (major + 1) * sizeof(unsigned int));
-					while (maxmajor <= major) {
-						notification[maxmajor] = NULL;
-						maxminor[maxmajor] = 0;
-						maxmajor++;
-					}
-					maxmajor--;
-				}
-				if (maxminor[major] < minor) {
-					notification[major] = realloc(notification[major], (minor + 1) * sizeof(size_t));
-					while (maxminor[major] <= minor) {
-						notification[major][maxminor[major]] = NULL;
-						maxminor[major]++;
-					}
-					maxminor[major]--;
-				}
-
 				action = udev_device_get_action(dev)[0];
 				switch(action) {
 					case 'a':
@@ -175,16 +187,13 @@ int main (int argc, char ** argv) {
 				printf("%s: %s\n", argv[0], notifystr);
 #endif
 
-				if (notification[major][minor] == NULL) {
-					notification[major][minor] = notify_notification_new(TEXT_TOPIC, notifystr, icon);
-					notify_notification_set_category(notification[major][minor], PROGNAME);
-					notify_notification_set_urgency (notification[major][minor], NOTIFY_URGENCY_NORMAL);
-				} else
-					notify_notification_update(notification[major][minor], TEXT_TOPIC, notifystr, icon);
+				/* get a notification */
+				notification = get_notification(notifications, devnum);
 
-				notify_notification_set_timeout(notification[major][minor], NOTIFICATION_TIMEOUT);
+				notify_notification_update(notification, TEXT_TOPIC, notifystr, icon);
+				notify_notification_set_timeout(notification, NOTIFICATION_TIMEOUT);
 
-				while(!notify_notification_show(notification[major][minor], &error)) {
+				while(!notify_notification_show(notification, &error)) {
 					if (errcount > 1) {
 						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", argv[0]);
 						exit(EXIT_FAILURE);
