@@ -52,7 +52,12 @@ NotifyNotification * get_notification(struct notifications *notifications, dev_t
 	notifications->next = malloc(sizeof(struct notifications));
 	notifications = notifications->next;
 	notifications->devnum = devnum;
-	notifications->notification = notify_notification_new("", "", "");
+	notifications->notification =
+#if NOTIFY_CHECK_VERSION(0, 7, 0)
+		 notify_notification_new(NULL, NULL, NULL);
+#else
+		 notify_notification_new(NULL, NULL, NULL, NULL);
+#endif
 	notifications->next = NULL;
 
 	notify_notification_set_category(notifications->notification, PROGNAME);
