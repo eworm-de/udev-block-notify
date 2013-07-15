@@ -42,6 +42,8 @@ struct notifications {
 
 /*** get_notification ***/
 NotifyNotification * get_notification(struct notifications *notifications, dev_t devnum) {
+	/* work with notifications->next here, we need it later to not miss
+	 * the pointer in main struct */
 	while (notifications->next != NULL) {
 		if (notifications->next->devnum == devnum)
 			return notifications->next->notification;
@@ -67,7 +69,7 @@ NotifyNotification * get_notification(struct notifications *notifications, dev_t
 }
 
 /*** newstr ***/
-char * newstr(char *text, char *device, unsigned short int major, unsigned short int minor) {
+char * newstr(const char *text, char *device, unsigned short int major, unsigned short int minor) {
 	char *notifystr;
 
 	notifystr = malloc(strlen(text) + strlen(device) + 10 /* max string length 2* unsigned short int */);
@@ -77,14 +79,14 @@ char * newstr(char *text, char *device, unsigned short int major, unsigned short
 }
 
 /*** appendstr ***/
-char * appendstr(char *text, char *notifystr, char *property, const char *value) {
+char * appendstr(const char *text, char *notifystr, char *property, const char *value) {
 	notifystr = realloc(notifystr, strlen(text) + strlen(notifystr) + strlen(property) + strlen(value));
 	sprintf(notifystr + strlen(notifystr), text, property, value);
 
 	return notifystr;
 }
 
-/* main */
+/*** main ***/
 int main (int argc, char ** argv) {
 	char action;
 	char *device = NULL, *icon = NULL, *notifystr = NULL;
@@ -121,6 +123,7 @@ int main (int argc, char ** argv) {
 	udev_monitor_filter_add_match_subsystem_devtype(mon, "block", NULL);
 	udev_monitor_enable_receiving(mon);
 
+	/* allocate first struct element as dummy */
 	notifications = malloc(sizeof(struct notifications));
 	notifications->devnum = 0;
 	notifications->notification = NULL;
