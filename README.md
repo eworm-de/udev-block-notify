@@ -18,7 +18,7 @@ To compile and run `udev-block-notify` you need:
 * [markdown](http://daringfireball.net/projects/markdown/) (HTML documentation)
 
 Some systems may require additional development packages for the libraries.
-Look for `systemd-devel`, `libudev-devel` or similar.
+Look for `libnotify-devel`, `systemd-devel`, `libudev-devel` or similar.
 
 Build and install
 -----------------
