@@ -16,6 +16,7 @@ To compile and run `udev-block-notify` you need:
 * [libnotify](http://library.gnome.org/devel/notification-spec/)
 * [systemd](http://www.freedesktop.org/wiki/Software/systemd) (or `udev` which has been merge into `systemd`)
 * [markdown](http://daringfireball.net/projects/markdown/) (HTML documentation)
+* `gnome-icon-theme` (or anything else that includes an icon named `media-removable`)
 
 Some systems may require additional development packages for the libraries.
 Look for `libnotify-devel`, `systemd-devel`, `libudev-devel` or similar.
