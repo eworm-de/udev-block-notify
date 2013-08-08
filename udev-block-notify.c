@@ -55,11 +55,11 @@ NotifyNotification * get_notification(struct notifications *notifications, dev_t
 	notifications = notifications->next;
 	notifications->devnum = devnum;
 	notifications->notification =
-#if NOTIFY_CHECK_VERSION(0, 7, 0)
-		 notify_notification_new(NULL, NULL, NULL);
-#else
-		 notify_notification_new(NULL, NULL, NULL, NULL);
-#endif
+#		if NOTIFY_CHECK_VERSION(0, 7, 0)
+		notify_notification_new(NULL, NULL, NULL);
+#		else
+		notify_notification_new(NULL, NULL, NULL, NULL);
+#		endif
 	notifications->next = NULL;
 
 	notify_notification_set_category(notifications->notification, PROGNAME);
@@ -103,9 +103,9 @@ int main (int argc, char ** argv) {
 	struct udev *udev = NULL;
 
 	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__
-#if DEBUG
+#			if DEBUG
 			", with debug output"
-#endif
+#			endif
 	")\n", argv[0], PROGNAME, VERSION);
 
 	if(!notify_init("Udev-Block-Notification")) {
@@ -143,9 +143,9 @@ int main (int argc, char ** argv) {
 				devnum = udev_device_get_devnum(dev);
 				major = major(devnum);
 				minor = minor(devnum);
-#if DEBUG
+#				if DEBUG
 				printf("%s: Processing device %d:%d\n", argv[0], major, minor);
-#endif
+#				endif
 				action = udev_device_get_action(dev)[0];
 				switch(action) {
 					case 'a':
@@ -191,9 +191,9 @@ int main (int argc, char ** argv) {
 						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Type", value);
 				}
 
-#if DEBUG
+#				if DEBUG
 				printf("%s: %s\n", argv[0], notifystr);
-#endif
+#				endif
 
 				/* get a notification */
 				notification = get_notification(notifications, devnum);
