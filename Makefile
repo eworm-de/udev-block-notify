@@ -20,11 +20,11 @@ README.html: README.md
 
 install: install-bin install-doc
 
-install-bin:
+install-bin: udev-block-notify
 	$(INSTALL) -D -m0755 udev-block-notify $(DESTDIR)/usr/bin/udev-block-notify
 	$(INSTALL) -D -m0644 udev-block-notify.desktop $(DESTDIR)/etc/xdg/autostart/udev-block-notify.desktop
 
-install-doc:
+install-doc: README.html
 	$(INSTALL) -D -m0644 README.md $(DESTDIR)/usr/share/doc/udev-block-notify/README.md
 	$(INSTALL) -D -m0644 README.html $(DESTDIR)/usr/share/doc/udev-block-notify/README.html
 	$(INSTALL) -D -m0644 screenshot.png $(DESTDIR)/usr/share/doc/udev-block-notify/screenshot.png
