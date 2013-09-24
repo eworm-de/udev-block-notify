@@ -20,11 +20,12 @@
 #define DEBUG	0
 #endif
 
+#define ICON_DEVICE_MAPPER		"media-playlist-shuffle"
 #define ICON_DRIVE_HARDDISK		"drive-harddisk"
 #define ICON_DRIVE_HARDDISK_IEEE1394	"drive-harddisk-ieee1394"
 #define ICON_DRIVE_HARDDISK_USB		"drive-harddisk-usb"
 #define ICON_DRIVE_OPTICAL		"drive-optical"
-#define ICON_LOOP			"processor"
+#define ICON_LOOP			"media-playlist-repeat"
 #define ICON_MEDIA_FLASH		"media-flash"
 #define ICON_MEDIA_FLOPPY		"media-floppy"
 #define ICON_MEDIA_REMOVABLE		"media-removable"
@@ -219,6 +220,8 @@ int main (int argc, char ** argv) {
 					icon = ICON_MEDIA_ZIP;
 				} else if (udev_device_get_property_value(dev, "ID_MEDIA_PLAYER") != NULL) {
 					icon = ICON_MULTIMEDIA_PLAYER;
+				} else if (udev_device_get_property_value(dev, "DM_NAME") != NULL) {
+					icon = ICON_DEVICE_MAPPER;
 				} else if (strncmp(device, "loop", 4) == 0 ||
 						strncmp(device, "ram", 3) == 0) {
 					icon = ICON_LOOP;
