@@ -31,6 +31,7 @@
 #define ICON_MEDIA_REMOVABLE		"media-removable"
 #define ICON_MEDIA_ZIP			"media-zip"
 #define ICON_MULTIMEDIA_PLAYER		"multimedia-player"
+#define ICON_NETWORK_SERVER		"network-server"
 #define ICON_UNKNOWN			"dialog-question"
 
 #define TEXT_TOPIC	"Udev Block Notification"
@@ -234,6 +235,8 @@ int main (int argc, char ** argv) {
 				} else if (strncmp(device, "loop", 4) == 0 ||
 						strncmp(device, "ram", 3) == 0) {
 					icon = ICON_LOOP;
+				} else if (strncmp(device, "nbd", 3) == 0) {
+					icon = ICON_NETWORK_SERVER;
 				} else if (value != NULL) {
 					if (strcmp(value, "ata") == 0 ||
 							strcmp(value, "scsi") == 0) {
