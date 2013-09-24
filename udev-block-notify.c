@@ -148,6 +148,17 @@ int main (int argc, char ** argv) {
 			dev = udev_monitor_receive_device(mon);
 			if(dev) {
 				device = (char *) udev_device_get_sysname(dev);
+				
+				/* ignore temporary device mapper devices
+				 * is there a better way to do this? */
+				if (strncmp(device, "dm", 2) == 0 &&
+						udev_device_get_property_value(dev, "DM_NAME") == NULL) {
+#					if DEBUG
+					printf("%s: Skipping temporary dm device %s\n", argv[0], device);
+#					endif
+					continue;
+				}
+
 				devnum = udev_device_get_devnum(dev);
 				major = major(devnum);
 				minor = minor(devnum);
