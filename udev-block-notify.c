@@ -20,11 +20,18 @@
 #define DEBUG	0
 #endif
 
-#define ICON_ADD	"media-removable"
-#define ICON_REMOVE	"media-removable"
-#define ICON_MOVE	"media-removable"
-#define ICON_CHANGE	"media-removable"
-#define ICON_DEFAULT	"media-removable"
+#define ICON_DRIVE_HARDDISK		"drive-harddisk"
+#define ICON_DRIVE_HARDDISK_IEEE1394	"drive-harddisk-ieee1394"
+#define ICON_DRIVE_HARDDISK_USB		"drive-harddisk-usb"
+#define ICON_DRIVE_OPTICAL		"drive-optical"
+#define ICON_LOOP			"processor"
+#define ICON_MEDIA_FLASH		"media-flash"
+#define ICON_MEDIA_FLOPPY		"media-floppy"
+#define ICON_MEDIA_REMOVABLE		"media-removable"
+#define ICON_MEDIA_TAPE			"media-tape"
+#define ICON_MEDIA_ZIP			"media-zip"
+#define ICON_MULTIMEDIA_PLAYER		"multimedia-player"
+#define ICON_UNKNOWN			"dialog-question"
 
 #define TEXT_TOPIC	"Udev Block Notification"
 #define TEXT_ADD	"Device <b>%s</b> (%i:%i) <b>appeared</b>."
@@ -151,27 +158,22 @@ int main (int argc, char ** argv) {
 					case 'a':
 						// a: add
 						notifystr = newstr(TEXT_ADD, device, major, minor);
-						icon = ICON_ADD;
 						break;
 					case 'r':
 						// r: remove
 						notifystr = newstr(TEXT_REMOVE, device, major, minor);
-						icon = ICON_REMOVE;
 						break;
 					case 'm':
 						// m: move
 						notifystr = newstr(TEXT_MOVE, device, major, minor);
-						icon = ICON_MOVE;
 						break;
 					case 'c':
 						// c: change
 						notifystr = newstr(TEXT_CHANGE, device, major, minor);
-						icon = ICON_CHANGE;
 						break;
 					default:
 						// we should never get here I think...
 						notifystr = newstr(TEXT_DEFAULT, device, major, minor);
-						icon = ICON_DEFAULT;
 				}
 
 				if (action != 'r') {
@@ -200,6 +202,39 @@ int main (int argc, char ** argv) {
 
 				/* get a notification */
 				notification = get_notification(notifications, devnum);
+
+				/* decide about what icon to use */
+				value = udev_device_get_property_value(dev, "ID_BUS");
+				if (udev_device_get_property_value(dev, "ID_DRIVE_CDROM") != NULL) {
+					icon = ICON_DRIVE_OPTICAL;
+				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY") != NULL) {
+					icon = ICON_MEDIA_FLOPPY;
+				} else if (udev_device_get_property_value(dev, "ID_DRIVE_THUMB") != NULL) {
+					icon = ICON_MEDIA_REMOVABLE;
+				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLASH_CF") != NULL ||
+						udev_device_get_property_value(dev, "ID_DRIVE_FLASH_MS") != NULL ||
+						udev_device_get_property_value(dev, "ID_DRIVE_FLASH_SD") != NULL ||
+						udev_device_get_property_value(dev, "ID_DRIVE_FLASH_SM") != NULL) {
+					icon = ICON_MEDIA_FLASH;
+				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY_ZIP") != NULL) {
+					icon = ICON_MEDIA_ZIP;
+				} else if (udev_device_get_property_value(dev, "ID_MEDIA_PLAYER") != NULL) {
+					icon = ICON_MULTIMEDIA_PLAYER;
+				} else if (strncmp(device, "loop", 4) == 0 ||
+						strncmp(device, "ram", 3) == 0) {
+					icon = ICON_LOOP;
+				} else if (value != NULL) {
+					if (strcmp(value, "ata") == 0 ||
+							strcmp(value, "scsi") == 0) {
+						icon = ICON_DRIVE_HARDDISK;
+					} else if (strcmp(value, "usb") == 0) {
+						icon = ICON_DRIVE_HARDDISK_USB;
+					} else if (strcmp(value, "ieee1394") == 0) {
+						icon = ICON_DRIVE_HARDDISK_IEEE1394;
+					}
+				} else
+					/* we should never get here... what drive is it? */
+					icon = ICON_UNKNOWN;
 
 				notify_notification_update(notification, TEXT_TOPIC, notifystr, icon);
 				notify_notification_set_timeout(notification, NOTIFICATION_TIMEOUT);
