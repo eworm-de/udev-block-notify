@@ -175,6 +175,9 @@ int main (int argc, char ** argv) {
 				}
 
 				if (action != 'r') {
+					/* Get possible values with:
+					 * $ udevadm info --query=all --name=/path/to/dev
+					 * Values available differs from device type and content */
 					if ((value = udev_device_get_property_value(dev, "ID_FS_LABEL")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "Label", value);
 					if ((value = udev_device_get_property_value(dev, "ID_FS_TYPE")) != NULL)
