@@ -180,6 +180,8 @@ int main (int argc, char ** argv) {
 					/* Get possible values with:
 					 * $ udevadm info --query=all --name=/path/to/dev
 					 * Values available differs from device type and content */
+
+					/* file system */
 					if ((value = udev_device_get_property_value(dev, "ID_FS_LABEL")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "Label", value);
 					if ((value = udev_device_get_property_value(dev, "ID_FS_TYPE")) != NULL)
@@ -188,12 +190,19 @@ int main (int argc, char ** argv) {
 						notifystr = appendstr(TEXT_TAG, notifystr, "Usage", value);
 					if ((value = udev_device_get_property_value(dev, "ID_FS_UUID")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "UUID", value);
+
+					/* partition */
 					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_TYPE")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Table Type", value);
 					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_NAME")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Name", value);
 					if ((value = udev_device_get_property_value(dev, "ID_PART_ENTRY_TYPE")) != NULL)
 						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Type", value);
+
+					/* device mapper */
+					if ((value = udev_device_get_property_value(dev, "DM_NAME")) != NULL)
+						notifystr = appendstr(TEXT_TAG, notifystr, "Device mapper name", value);
+
 				}
 
 #				if DEBUG
