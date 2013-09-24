@@ -96,7 +96,7 @@ char * appendstr(const char *text, char *notifystr, char *property, const char *
 
 /*** main ***/
 int main (int argc, char ** argv) {
-	char action;
+	const char *action = NULL;
 	char *device = NULL, *icon = NULL, *notifystr = NULL;
 	const char *value = NULL;
 	fd_set readfds;
@@ -165,57 +165,44 @@ int main (int argc, char ** argv) {
 #				if DEBUG
 				printf("%s: Processing device %d:%d\n", argv[0], major, minor);
 #				endif
-				action = udev_device_get_action(dev)[0];
-				switch(action) {
-					case 'a':
-						// a: add
-						notifystr = newstr(TEXT_ADD, device, major, minor);
-						break;
-					case 'r':
-						// r: remove
-						notifystr = newstr(TEXT_REMOVE, device, major, minor);
-						break;
-					case 'm':
-						// m: move
-						notifystr = newstr(TEXT_MOVE, device, major, minor);
-						break;
-					case 'c':
-						// c: change
-						notifystr = newstr(TEXT_CHANGE, device, major, minor);
-						break;
-					default:
-						// we should never get here I think...
-						notifystr = newstr(TEXT_DEFAULT, device, major, minor);
-				}
+				action = udev_device_get_action(dev);
+				if (strcmp(action, "add") == 0)
+					notifystr = newstr(TEXT_ADD, device, major, minor);
+				else if (strcmp(action, "remove") == 0)
+					notifystr = newstr(TEXT_REMOVE, device, major, minor);
+				else if (strcmp(action, "move") == 0)
+					notifystr = newstr(TEXT_MOVE, device, major, minor);
+				else if (strcmp(action, "change") == 0)
+					notifystr = newstr(TEXT_CHANGE, device, major, minor);
+				else
+					/* we should never get here I think... */
+					notifystr = newstr(TEXT_DEFAULT, device, major, minor);
 
-				if (action != 'r') {
-					/* Get possible values with:
-					 * $ udevadm info --query=all --name=/path/to/dev
-					 * Values available differs from device type and content */
+				/* Get possible values with:
+				 * $ udevadm info --query=all --name=/path/to/dev
+				 * Values available differs from device type and content */
 
-					/* file system */
-					if ((value = udev_device_get_property_value(dev, "ID_FS_LABEL")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Label", value);
-					if ((value = udev_device_get_property_value(dev, "ID_FS_TYPE")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Type", value);
-					if ((value = udev_device_get_property_value(dev, "ID_FS_USAGE")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Usage", value);
-					if ((value = udev_device_get_property_value(dev, "ID_FS_UUID")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "UUID", value);
+				/* file system */
+				if ((value = udev_device_get_property_value(dev, "ID_FS_LABEL")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Label", value);
+				if ((value = udev_device_get_property_value(dev, "ID_FS_TYPE")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Type", value);
+				if ((value = udev_device_get_property_value(dev, "ID_FS_USAGE")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Usage", value);
+				if ((value = udev_device_get_property_value(dev, "ID_FS_UUID")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "UUID", value);
 
-					/* partition */
-					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_TYPE")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Table Type", value);
-					if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_NAME")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Name", value);
-					if ((value = udev_device_get_property_value(dev, "ID_PART_ENTRY_TYPE")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Partition Type", value);
+				/* partition */
+				if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_TYPE")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Partition Table Type", value);
+				if ((value = udev_device_get_property_value(dev, "ID_PART_TABLE_NAME")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Partition Name", value);
+				if ((value = udev_device_get_property_value(dev, "ID_PART_ENTRY_TYPE")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Partition Type", value);
 
-					/* device mapper */
-					if ((value = udev_device_get_property_value(dev, "DM_NAME")) != NULL)
-						notifystr = appendstr(TEXT_TAG, notifystr, "Device mapper name", value);
-
-				}
+				/* device mapper */
+				if ((value = udev_device_get_property_value(dev, "DM_NAME")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Device mapper name", value);
 
 #				if DEBUG
 				printf("%s: %s\n", argv[0], notifystr);
