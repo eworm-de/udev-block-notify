@@ -213,7 +213,7 @@ int main (int argc, char ** argv) {
 
 				/* decide about what icon to use */
 				value = udev_device_get_property_value(dev, "ID_BUS");
-				if (udev_device_get_property_value(dev, "ID_DRIVE_CDROM") != NULL) {
+				if (udev_device_get_property_value(dev, "ID_CDROM") != NULL) {
 					icon = ICON_DRIVE_OPTICAL;
 				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY") != NULL) {
 					icon = ICON_MEDIA_FLOPPY;
