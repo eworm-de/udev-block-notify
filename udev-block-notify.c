@@ -25,6 +25,7 @@
 #define ICON_DRIVE_HARDDISK_IEEE1394	"drive-harddisk-ieee1394"
 #define ICON_DRIVE_HARDDISK_USB		"drive-harddisk-usb"
 #define ICON_DRIVE_OPTICAL		"drive-optical"
+#define ICON_DRIVE_MULTIDISK		"drive-multidisk"
 #define ICON_LOOP			"media-playlist-repeat"
 #define ICON_MEDIA_FLASH		"media-flash"
 #define ICON_MEDIA_FLOPPY		"media-floppy"
@@ -235,6 +236,8 @@ int main (int argc, char ** argv) {
 					icon = ICON_LOOP;
 				} else if (strncmp(device, "nbd", 3) == 0) {
 					icon = ICON_NETWORK_SERVER;
+				} else if (strncmp(device, "md", 2) == 0) {
+					icon = ICON_DRIVE_MULTIDISK;
 				} else if (value != NULL) {
 					if (strcmp(value, "ata") == 0 ||
 							strcmp(value, "scsi") == 0) {
