@@ -214,37 +214,38 @@ int main (int argc, char ** argv) {
 
 				/* decide about what icon to use */
 				value = udev_device_get_property_value(dev, "ID_BUS");
-				if (udev_device_get_property_value(dev, "ID_CDROM") != NULL) {
+				if (udev_device_get_property_value(dev, "ID_CDROM") != NULL) { /* optical drive */
 					icon = ICON_DRIVE_OPTICAL;
-				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY") != NULL) {
+				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY") != NULL) { /* floppy drive */
 					icon = ICON_MEDIA_FLOPPY;
-				} else if (udev_device_get_property_value(dev, "ID_DRIVE_THUMB") != NULL) {
+				} else if (udev_device_get_property_value(dev, "ID_DRIVE_THUMB") != NULL) { /* thumb drive, e.g. USB flash */
 					icon = ICON_MEDIA_REMOVABLE;
 				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLASH_CF") != NULL ||
 						udev_device_get_property_value(dev, "ID_DRIVE_FLASH_MS") != NULL ||
 						udev_device_get_property_value(dev, "ID_DRIVE_FLASH_SD") != NULL ||
-						udev_device_get_property_value(dev, "ID_DRIVE_FLASH_SM") != NULL) {
+						udev_device_get_property_value(dev, "ID_DRIVE_FLASH_SM") != NULL) { /* flash card reader */
+							/* note that usb card reader are recognized as USB hard disk */
 					icon = ICON_MEDIA_FLASH;
-				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY_ZIP") != NULL) {
+				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY_ZIP") != NULL) { /* ZIP drive */
 					icon = ICON_MEDIA_ZIP;
-				} else if (udev_device_get_property_value(dev, "ID_MEDIA_PLAYER") != NULL) {
+				} else if (udev_device_get_property_value(dev, "ID_MEDIA_PLAYER") != NULL) { /* media player */
 					icon = ICON_MULTIMEDIA_PLAYER;
-				} else if (udev_device_get_property_value(dev, "DM_NAME") != NULL) {
+				} else if (udev_device_get_property_value(dev, "DM_NAME") != NULL) { /* device mapper */
 					icon = ICON_DEVICE_MAPPER;
-				} else if (strncmp(device, "loop", 4) == 0 ||
-						strncmp(device, "ram", 3) == 0) {
-					icon = ICON_LOOP;
-				} else if (strncmp(device, "nbd", 3) == 0) {
-					icon = ICON_NETWORK_SERVER;
-				} else if (strncmp(device, "md", 2) == 0) {
+				} else if (udev_device_get_property_value(dev, "MD_NAME") != NULL) { /* multi disk */
 					icon = ICON_DRIVE_MULTIDISK;
+				} else if (strncmp(device, "loop", 4) == 0 ||
+						strncmp(device, "ram", 3) == 0) { /* loop & RAM */
+					icon = ICON_LOOP;
+				} else if (strncmp(device, "nbd", 3) == 0) { /* network block device */
+					icon = ICON_NETWORK_SERVER;
 				} else if (value != NULL) {
 					if (strcmp(value, "ata") == 0 ||
-							strcmp(value, "scsi") == 0) {
+							strcmp(value, "scsi") == 0) { /* internal (s)ata/scsi hard disk */
 						icon = ICON_DRIVE_HARDDISK;
-					} else if (strcmp(value, "usb") == 0) {
+					} else if (strcmp(value, "usb") == 0) { /* USB hard disk */
 						icon = ICON_DRIVE_HARDDISK_USB;
-					} else if (strcmp(value, "ieee1394") == 0) {
+					} else if (strcmp(value, "ieee1394") == 0) { /* firewire hard disk */
 						icon = ICON_DRIVE_HARDDISK_IEEE1394;
 					}
 				} else
