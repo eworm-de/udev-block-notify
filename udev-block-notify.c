@@ -205,6 +205,10 @@ int main (int argc, char ** argv) {
 				if ((value = udev_device_get_property_value(dev, "DM_NAME")) != NULL)
 					notifystr = appendstr(TEXT_TAG, notifystr, "Device mapper name", value);
 
+				/* multi disk */
+				if ((value = udev_device_get_property_value(dev, "MD_LEVEL")) != NULL)
+					notifystr = appendstr(TEXT_TAG, notifystr, "Multi disk level", value);
+
 #				if DEBUG
 				printf("%s: %s\n", argv[0], notifystr);
 #				endif
