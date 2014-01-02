@@ -13,6 +13,8 @@
 #include <libnotify/notify.h>
 #include <libudev.h>
 
+#include "version.h"
+
 #define PROGNAME	"udev-block-notify"
 
 #define NOTIFICATION_TIMEOUT	10000

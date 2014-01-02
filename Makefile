@@ -5,20 +5,21 @@ MD	:= markdown
 INSTALL	:= install
 RM	:= rm
 CFLAGS	+= -O2 -Wall -Werror
-CFLAGS	+= $(shell pkg-config --cflags --libs libudev) \
-	   $(shell pkg-config --cflags --libs libnotify)
-VERSION := $(shell git describe --tags --long 2>/dev/null)
+CFLAGS	+= $(shell pkg-config --cflags --libs libudev)
+CFLAGS	+= $(shell pkg-config --cflags --libs libnotify)
 # this is just a fallback in case you do not use git but downloaded
 # a release tarball...
-ifeq ($(VERSION),)
 VERSION := 0.7.2
-endif
 
 all: udev-block-notify README.html
 
-udev-block-notify: udev-block-notify.c
-	$(CC) $(CFLAGS) -o udev-block-notify udev-block-notify.c \
-		-DVERSION="\"$(VERSION)\""
+udev-block-notify: udev-block-notify.c version.h
+	$(CC) $(CFLAGS) -o udev-block-notify udev-block-notify.c
+
+version.h: $(wildcard .git/HEAD .git/index .git/refs/tags/*) Makefile
+	echo "#ifndef VERSION" > $@
+	echo "#define VERSION \"$(shell git describe --tags --long 2>/dev/null || echo ${VERSION})\"" >> $@
+	echo "#endif" >> $@
 
 README.html: README.md
 	$(MD) README.md > README.html
@@ -35,4 +36,4 @@ install-doc: README.html
 	$(INSTALL) -D -m0644 screenshot.png $(DESTDIR)/usr/share/doc/udev-block-notify/screenshot.png
 
 clean:
-	$(RM) -f *.o *~ README.html udev-block-notify
+	$(RM) -f *.o *~ README.html udev-block-notify version.h
