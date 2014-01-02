@@ -37,3 +37,7 @@ install-doc: README.html
 
 clean:
 	$(RM) -f *.o *~ README.html udev-block-notify version.h
+
+release:
+	git archive --format=tar.xz --prefix=udev-block-notify-$(VERSION)/ $(VERSION) > udev-block-notify-$(VERSION).tar.xz
+	gpg -ab udev-block-notify-$(VERSION).tar.xz
