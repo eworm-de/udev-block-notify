@@ -218,6 +218,10 @@ int main (int argc, char ** argv) {
 				/* get a notification */
 				notification = get_notification(notifications, devnum);
 
+				/* this is a fallback and should be replaced below
+				 * if it is not... what drive is it? */
+				icon = ICON_UNKNOWN;
+
 				/* decide about what icon to use */
 				value = udev_device_get_property_value(dev, "ID_BUS");
 				if (udev_device_get_property_value(dev, "ID_CDROM") != NULL) { /* optical drive */
@@ -254,9 +258,7 @@ int main (int argc, char ** argv) {
 					} else if (strcmp(value, "ieee1394") == 0) { /* firewire hard disk */
 						icon = ICON_DRIVE_HARDDISK_IEEE1394;
 					}
-				} else
-					/* we should never get here... what drive is it? */
-					icon = ICON_UNKNOWN;
+				}
 
 				notify_notification_update(notification, TEXT_TOPIC, notifystr, icon);
 				notify_notification_set_timeout(notification, NOTIFICATION_TIMEOUT);
