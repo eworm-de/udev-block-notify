@@ -5,8 +5,10 @@
  * of the GNU General Public License, incorporated herein by reference.
  */
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -18,9 +20,6 @@
 #define PROGNAME	"udev-block-notify"
 
 #define NOTIFICATION_TIMEOUT	10000
-#ifndef DEBUG
-#define DEBUG	0
-#endif
 
 #define ICON_DEVICE_MAPPER		"media-playlist-shuffle"
 #define ICON_DRIVE_HARDDISK		"drive-harddisk"
@@ -45,11 +44,21 @@
 #define TEXT_DEFAULT	"Anything happend to <b>%s</b> (%i:%i)... Don't know."
 #define TEXT_TAG	"\n%s: <i>%s</i>"
 
+const static char optstring[] = "hv";
+const static struct option options_long[] = {
+	/* name		has_arg		flag	val */
+	{ "help",	no_argument,	NULL,	'h' },
+	{ "verbose",	no_argument,	NULL,	'v' },
+	{ 0, 0, 0, 0 }
+};
+
 struct notifications {
 	dev_t devnum;
 	NotifyNotification *notification;
 	struct notifications *next;
 };
+
+uint8_t verbose = 0;
 
 /*** get_notification ***/
 NotifyNotification * get_notification(struct notifications *notifications, dev_t devnum) {
@@ -106,18 +115,26 @@ int main (int argc, char ** argv) {
 	GError *error = NULL;
 	NotifyNotification *notification = NULL;
 	struct notifications *notifications = NULL;
-	int errcount = 0;
+	int errcount = 0, i;
 	dev_t devnum = 0;
 	unsigned int major = 0, minor = 0;
 	struct udev_device *dev = NULL;
 	struct udev_monitor *mon = NULL;
 	struct udev *udev = NULL;
 
-	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__
-#			if DEBUG
-			", with debug output"
-#			endif
-	")\n", argv[0], PROGNAME, VERSION);
+	/* get the verbose status */
+	while ((i = getopt_long(argc, argv, optstring, options_long, NULL)) != -1) {
+		switch (i) {
+			case 'h':
+				printf("usage: %s [-h] [-v]\n", argv[0]);
+				return EXIT_SUCCESS;
+			case 'v':
+				verbose++;
+				break;
+		}
+	}
+
+	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
 
 	if(!notify_init("Udev-Block-Notification")) {
 		fprintf(stderr, "%s: Can't create notify.\n", argv[0]);
@@ -156,18 +173,18 @@ int main (int argc, char ** argv) {
 				 * is there a better way to do this? */
 				if (strncmp(device, "dm", 2) == 0 &&
 						udev_device_get_property_value(dev, "DM_NAME") == NULL) {
-#					if DEBUG
-					printf("%s: Skipping temporary dm device %s\n", argv[0], device);
-#					endif
+					if (verbose > 0)
+						printf("%s: Skipping temporary dm device %s\n", argv[0], device);
 					continue;
 				}
 
 				devnum = udev_device_get_devnum(dev);
 				major = major(devnum);
 				minor = minor(devnum);
-#				if DEBUG
-				printf("%s: Processing device %d:%d\n", argv[0], major, minor);
-#				endif
+
+				if (verbose > 0)
+					printf("%s: Processing device %d:%d\n", argv[0], major, minor);
+
 				action = udev_device_get_action(dev);
 				if (strcmp(action, "add") == 0)
 					notifystr = newstr(TEXT_ADD, device, major, minor);
@@ -211,9 +228,8 @@ int main (int argc, char ** argv) {
 				if ((value = udev_device_get_property_value(dev, "MD_LEVEL")) != NULL)
 					notifystr = appendstr(TEXT_TAG, notifystr, "Multi disk level", value);
 
-#				if DEBUG
-				printf("%s: %s\n", argv[0], notifystr);
-#				endif
+				if (verbose > 0)
+					printf("%s: %s\n", argv[0], notifystr);
 
 				/* get a notification */
 				notification = get_notification(notifications, devnum);
