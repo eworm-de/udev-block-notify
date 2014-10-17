@@ -1,6 +1,6 @@
 # udev-block-notify - Notify about udev block events
 
-CC	:= gcc
+CC	:= gcc -std=c11
 MD	:= markdown
 INSTALL	:= install
 RM	:= rm

@@ -5,6 +5,8 @@
  * of the GNU General Public License, incorporated herein by reference.
  */
 
+#define _GNU_SOURCE
+
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
