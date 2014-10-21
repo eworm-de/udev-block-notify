@@ -1,10 +1,10 @@
 # udev-block-notify - Notify about udev block events
 
-CC	:= gcc -std=c11
+CC	:= gcc
 MD	:= markdown
 INSTALL	:= install
 RM	:= rm
-CFLAGS	+= -O2 -Wall -Werror
+CFLAGS	+= -std=c11 -O2 -Wall -Werror
 CFLAGS	+= $(shell pkg-config --cflags --libs libudev)
 CFLAGS	+= $(shell pkg-config --cflags --libs libnotify)
 # this is just a fallback in case you do not use git but downloaded
