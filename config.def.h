@@ -10,6 +10,7 @@
 
 #define NOTIFICATION_TIMEOUT	10000
 
+/* this icons shown */
 #define ICON_DEVICE_MAPPER		"media-playlist-shuffle"
 #define ICON_DRIVE_HARDDISK		"drive-harddisk"
 #define ICON_DRIVE_HARDDISK_IEEE1394	"drive-harddisk-ieee1394"
@@ -25,6 +26,7 @@
 #define ICON_NETWORK_SERVER		"network-server"
 #define ICON_UNKNOWN			"dialog-question"
 
+/* the text displayed */
 #define TEXT_TOPIC	"Udev Block Notification"
 #define TEXT_ADD	"Device <b>%s</b> (%i:%i) <b>appeared</b>."
 #define TEXT_REMOVE	"Device <b>%s</b> (%i:%i) <b>disappeared</b>."
