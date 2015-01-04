@@ -4,6 +4,7 @@ CC	:= gcc
 MD	:= markdown
 INSTALL	:= install
 RM	:= rm
+CP	:= cp
 CFLAGS	+= -std=c11 -O2 -Wall -Werror
 CFLAGS	+= $(shell pkg-config --cflags --libs libudev)
 CFLAGS	+= $(shell pkg-config --cflags --libs libnotify)
@@ -13,8 +14,11 @@ VERSION := 0.7.4
 
 all: udev-block-notify README.html
 
-udev-block-notify: udev-block-notify.c version.h
+udev-block-notify: udev-block-notify.c config.h version.h
 	$(CC) $(CFLAGS) -o udev-block-notify udev-block-notify.c
+
+config.h: config.def.h
+	$(CP) config.def.h config.h
 
 version.h: $(wildcard .git/HEAD .git/index .git/refs/tags/*) Makefile
 	echo "#ifndef VERSION" > $@
@@ -37,6 +41,9 @@ install-doc: README.html
 
 clean:
 	$(RM) -f *.o *~ README.html udev-block-notify version.h
+
+distclean:
+	$(RM) -f *.o *~ README.html udev-block-notify config.h version.h
 
 release:
 	git archive --format=tar.xz --prefix=udev-block-notify-$(VERSION)/ $(VERSION) > udev-block-notify-$(VERSION).tar.xz
