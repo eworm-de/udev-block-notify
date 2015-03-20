@@ -95,13 +95,12 @@ int main (int argc, char ** argv) {
 
 	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
 
-	if(!notify_init("Udev-Block-Notification")) {
+	if(notify_init("Udev-Block-Notification") == FALSE) {
 		fprintf(stderr, "%s: Can't create notify.\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
-	udev = udev_new();
-	if(!udev) {
+	if ((udev = udev_new()) == NULL) {
 		fprintf(stderr, "%s: Can't create udev.\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -238,7 +237,7 @@ int main (int argc, char ** argv) {
 				notify_notification_update(notification, TEXT_TOPIC, notifystr, icon);
 				notify_notification_set_timeout(notification, NOTIFICATION_TIMEOUT);
 
-				while(!notify_notification_show(notification, &error)) {
+				while(notify_notification_show(notification, &error) == FALSE) {
 					if (errcount > 1) {
 						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", argv[0]);
 						exit(EXIT_FAILURE);
@@ -253,7 +252,7 @@ int main (int argc, char ** argv) {
 
 						usleep(500 * 1000);
 
-						if(!notify_init("Udev-Block-Notification")) {
+						if(notify_init("Udev-Block-Notification") == FALSE) {
 							fprintf(stderr, "%s: Can't create notify.\n", argv[0]);
 							exit(EXIT_FAILURE);
 						}
