@@ -28,9 +28,19 @@ struct notifications {
 	struct notifications *next;
 };
 
-NotifyNotification * get_notification(struct notifications *notifications, dev_t devnum);
-char * newstr(const char *text, char *device, unsigned short int major, unsigned short int minor);
-char * appendstr(const char *text, char *notifystr, char *property, const char *value);
+/*** get_notification ***/
+NotifyNotification * get_notification(struct notifications *notifications,
+		dev_t devnum);
+
+/*** newstr ***/
+char * newstr(const char *text, char *device, unsigned short int major,
+		unsigned short int minor);
+
+/*** appendstr ***/
+char * appendstr(const char *text, char *notifystr, char *property,
+		const char *value);
+
+/*** main ***/
 int main (int argc, char ** argv);
 
 #endif /* UDEV_BLOCK_NOTIFY_H */
