@@ -48,7 +48,7 @@ NotifyNotification * get_notification(struct notifications *notifications, dev_t
 }
 
 /*** newstr ***/
-char * newstr(const char *text, char *device, unsigned short int major, unsigned short int minor) {
+char * newstr(const char *text, const char *device, unsigned short int major, unsigned short int minor) {
 	char *notifystr;
 
 	notifystr = malloc(strlen(text) + strlen(device) + 10 /* max string length 2* unsigned short int */);
@@ -58,7 +58,7 @@ char * newstr(const char *text, char *device, unsigned short int major, unsigned
 }
 
 /*** appendstr ***/
-char * appendstr(const char *text, char *notifystr, char *property, const char *value) {
+char * appendstr(const char *text, char *notifystr, const char *property, const char *value) {
 	notifystr = realloc(notifystr, strlen(text) + strlen(notifystr) + strlen(property) + strlen(value));
 	sprintf(notifystr + strlen(notifystr), text, property, value);
 
@@ -68,8 +68,8 @@ char * appendstr(const char *text, char *notifystr, char *property, const char *
 /*** main ***/
 int main (int argc, char ** argv) {
 	const char *action = NULL;
-	char *device = NULL, *icon = NULL, *notifystr = NULL;
-	const char *value = NULL;
+	const char *device = NULL, *value = NULL;
+	char *icon = NULL, *notifystr = NULL;
 	fd_set readfds;
 	GError *error = NULL;
 	NotifyNotification *notification = NULL;
@@ -125,7 +125,7 @@ int main (int argc, char ** argv) {
 		if ((mon != NULL) && FD_ISSET(udev_monitor_get_fd(mon), &readfds)) {
 			dev = udev_monitor_receive_device(mon);
 			if(dev) {
-				device = (char *) udev_device_get_sysname(dev);
+				device = udev_device_get_sysname(dev);
 
 				/* ignore temporary device mapper devices
 				 * is there a better way to do this? */

@@ -33,11 +33,11 @@ NotifyNotification * get_notification(struct notifications *notifications,
 		dev_t devnum);
 
 /*** newstr ***/
-char * newstr(const char *text, char *device, unsigned short int major,
+char * newstr(const char *text, const char *device, unsigned short int major,
 		unsigned short int minor);
 
 /*** appendstr ***/
-char * appendstr(const char *text, char *notifystr, char *property,
+char * appendstr(const char *text, char *notifystr, const char *property,
 		const char *value);
 
 /*** main ***/
