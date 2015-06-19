@@ -8,6 +8,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+/* how long to show notifications */
 #define NOTIFICATION_TIMEOUT	10000
 
 /* this icons shown */
