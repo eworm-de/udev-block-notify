@@ -9,11 +9,12 @@
 #include "config.h"
 #include "version.h"
 
-const static char optstring[] = "hv";
+const static char optstring[] = "ht:v";
 const static struct option options_long[] = {
-	/* name		has_arg		flag	val */
-	{ "help",	no_argument,	NULL,	'h' },
-	{ "verbose",	no_argument,	NULL,	'v' },
+	/* name		has_arg			flag	val */
+	{ "help",	no_argument,		NULL,	'h' },
+	{ "timeout",	required_argument,	NULL,	't' },
+	{ "verbose",	no_argument,		NULL,	'v' },
 	{ 0, 0, 0, 0 }
 };
 
@@ -74,6 +75,8 @@ int main (int argc, char ** argv) {
 	GError *error = NULL;
 	NotifyNotification *notification = NULL;
 	struct notifications *notifications = NULL;
+	unsigned int notification_timeout = NOTIFICATION_TIMEOUT;
+
 	int errcount = 0, i;
 	dev_t devnum = 0;
 	unsigned int major = 0, minor = 0;
@@ -85,8 +88,11 @@ int main (int argc, char ** argv) {
 	while ((i = getopt_long(argc, argv, optstring, options_long, NULL)) != -1) {
 		switch (i) {
 			case 'h':
-				printf("usage: %s [-h] [-v]\n", argv[0]);
+				printf("usage: %s [-h] [-t TIMEOUT] [-v]\n", argv[0]);
 				return EXIT_SUCCESS;
+			case 't':
+				notification_timeout = atof(optarg) * 1000;
+				break;
 			case 'v':
 				verbose++;
 				break;
@@ -249,7 +255,7 @@ int main (int argc, char ** argv) {
 				}
 
 				notify_notification_update(notification, TEXT_TOPIC, notifystr, icon);
-				notify_notification_set_timeout(notification, NOTIFICATION_TIMEOUT);
+				notify_notification_set_timeout(notification, notification_timeout);
 
 				while(notify_notification_show(notification, &error) == FALSE) {
 					if (errcount > 1) {
