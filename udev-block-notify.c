@@ -209,7 +209,11 @@ int main (int argc, char ** argv) {
 				/* decide about what icon to use */
 				value = udev_device_get_property_value(dev, "ID_BUS");
 				if (udev_device_get_property_value(dev, "ID_CDROM") != NULL) { /* optical drive */
-					icon = ICON_DRIVE_OPTICAL;
+					if (udev_device_get_property_value(dev, "ID_CDROM_MEDIA_TRACK_COUNT_AUDIO") != NULL) {
+						icon = ICON_MEDIA_OPTICAL_CD_AUDIO;
+					} else {
+						icon = ICON_DRIVE_OPTICAL;
+					}
 				} else if (udev_device_get_property_value(dev, "ID_DRIVE_FLOPPY") != NULL) { /* floppy drive */
 					icon = ICON_MEDIA_FLOPPY;
 				} else if (udev_device_get_property_value(dev, "ID_DRIVE_THUMB") != NULL) { /* thumb drive, e.g. USB flash */

@@ -20,6 +20,7 @@
 #define ICON_LOOP			"media-playlist-repeat"
 #define ICON_MEDIA_FLASH		"media-flash"
 #define ICON_MEDIA_FLOPPY		"media-floppy"
+#define ICON_MEDIA_OPTICAL_CD_AUDIO	"media-optical-cd-audio"
 #define ICON_MEDIA_REMOVABLE		"media-removable"
 #define ICON_MEDIA_ZIP			"media-zip"
 #define ICON_MULTIMEDIA_PLAYER		"multimedia-player"
