@@ -129,11 +129,21 @@ int main (int argc, char ** argv) {
 
 				/* ignore temporary device mapper devices
 				 * is there a better way to do this? */
-				if (strncmp(device, "dm", 2) == 0 &&
-						udev_device_get_property_value(dev, "DM_NAME") == NULL) {
-					if (verbose > 0)
-						printf("%s: Skipping temporary dm device %s\n", argv[0], device);
-					continue;
+				if (strncmp(device, "dm", 2) == 0) {
+					const char * property;
+
+					if (udev_device_get_property_value(dev, "DM_NAME") == NULL) {
+						if (verbose > 0)
+							printf("%s: Skipping temporary DM device %s\n", argv[0], device);
+						continue;
+					}
+					if ((property = udev_device_get_property_value(dev, "DM_LV_LAYER")) != NULL) {
+						if (strcmp(property, "cow") == 0 || strcmp(property, "real") == 0) {
+							if (verbose > 0)
+								printf("%s: Skipping DM %s device %s\n", argv[0], property, device);
+							continue;
+						}
+					}
 				}
 
 				devnum = udev_device_get_devnum(dev);
