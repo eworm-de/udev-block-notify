@@ -9,12 +9,13 @@
 #include "config.h"
 #include "version.h"
 
-const static char optstring[] = "ht:v";
+const static char optstring[] = "ht:vV";
 const static struct option options_long[] = {
 	/* name		has_arg			flag	val */
 	{ "help",	no_argument,		NULL,	'h' },
 	{ "timeout",	required_argument,	NULL,	't' },
 	{ "verbose",	no_argument,		NULL,	'v' },
+	{ "version",	no_argument,		NULL,	'V' },
 	{ 0, 0, 0, 0 }
 };
 
@@ -84,22 +85,35 @@ int main (int argc, char ** argv) {
 	struct udev_monitor *mon = NULL;
 	struct udev *udev = NULL;
 
+	unsigned int version = 0, help = 0;
+
 	/* get the verbose status */
 	while ((i = getopt_long(argc, argv, optstring, options_long, NULL)) != -1) {
 		switch (i) {
 			case 'h':
-				printf("usage: %s [-h] [-t TIMEOUT] [-v]\n", argv[0]);
-				return EXIT_SUCCESS;
+				help++;
+				break;
 			case 't':
 				notification_timeout = atof(optarg) * 1000;
 				break;
 			case 'v':
 				verbose++;
 				break;
+			case 'V':
+				verbose++;
+				version++;
+				break;
 		}
 	}
 
-	printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
+	if (verbose > 0)
+		printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
+
+	if (help > 0)
+		printf("usage: %s [-h] [-t TIMEOUT] [-v] [-V]\n", argv[0]);
+
+	if (version > 0 || help > 0)
+		return EXIT_SUCCESS;
 
 	if(notify_init("Udev-Block-Notification") == FALSE) {
 		fprintf(stderr, "%s: Can't create notify.\n", argv[0]);
