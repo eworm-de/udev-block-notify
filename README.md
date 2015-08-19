@@ -6,7 +6,13 @@ udev-block-notify
 This runs in background and produces notifications whenever udev (or systemd)
 receives an event about a block device. Notifications look like this:
 
-![Notification](screenshot.png)
+![Notification USB](screenshots/usb.png)
+
+Or for optical media:
+
+![Notification cd](screenshots/optical.png)
+
+These are just examples, it shows information about every block device.
 
 Requirements
 ------------

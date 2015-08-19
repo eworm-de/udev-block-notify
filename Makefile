@@ -37,7 +37,8 @@ install-bin: udev-block-notify
 install-doc: README.html
 	$(INSTALL) -D -m0644 README.md $(DESTDIR)/usr/share/doc/udev-block-notify/README.md
 	$(INSTALL) -D -m0644 README.html $(DESTDIR)/usr/share/doc/udev-block-notify/README.html
-	$(INSTALL) -D -m0644 screenshot.png $(DESTDIR)/usr/share/doc/udev-block-notify/screenshot.png
+	$(INSTALL) -D -m0644 screenshots/usb.png $(DESTDIR)/usr/share/doc/udev-block-notify/screenshots/usb.png
+	$(INSTALL) -D -m0644 screenshots/optical.png $(DESTDIR)/usr/share/doc/udev-block-notify/screenshots/optical.png
 
 clean:
 	$(RM) -f *.o *~ README.html udev-block-notify version.h
