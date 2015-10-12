@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Udev Block Notify
-Icon=media-removable
-Exec=/usr/bin/udev-block-notify
-Terminal=false
-Type=Application
-StartupNotify=false
-Categories=Utility

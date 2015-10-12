@@ -40,14 +40,14 @@ followed by:
 
 This will place an executable at `/usr/bin/udev-block-notify`,
 documentation can be found in `/usr/share/doc/udev-block-notify/`.
-Additionally a desktop file is installed to `/etc/xdg/autostart/`, this
-automatically starts the program when logged in to a desktop environment.
+Additionally a systemd unit file is installed to `/usr/lib/systemd/user/`.
 
 Usage
 -----
 
-Just run `udev-block-notify` after installation or re-login to desktop
-environment for autostart.
+Just run `udev-block-notify` to run it once. A systemd user service can be
+started and/or enabled with `systemctl --user start udev-block-notify`
+or `systemctl --user enable udev-block-notify`.
 
 ### Upstream
 

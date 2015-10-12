@@ -1,0 +1,9 @@
+[Unit]
+Description=Udev Block Notification
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/udev-block-notify
+
+[Install]
+WantedBy=default.target

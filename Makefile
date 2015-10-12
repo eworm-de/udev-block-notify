@@ -32,7 +32,7 @@ install: install-bin install-doc
 
 install-bin: udev-block-notify
 	$(INSTALL) -D -m0755 udev-block-notify $(DESTDIR)/usr/bin/udev-block-notify
-	$(INSTALL) -D -m0644 udev-block-notify.desktop $(DESTDIR)/etc/xdg/autostart/udev-block-notify.desktop
+	$(INSTALL) -D -m0644 systemd/udev-block-notify.service $(DESTDIR)/usr/lib/systemd/user/udev-block-notify.service
 
 install-doc: README.html
 	$(INSTALL) -D -m0644 README.md $(DESTDIR)/usr/share/doc/udev-block-notify/README.md
