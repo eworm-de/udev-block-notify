@@ -1,13 +1,18 @@
 # udev-block-notify - Notify about udev block events
 
+# commands
 CC	:= gcc
 MD	:= markdown
 INSTALL	:= install
 RM	:= rm
 CP	:= cp
-CFLAGS	+= -std=c11 -O2 -Wall -Werror
+
+# flags
+CFLAGS	+= -std=c11 -O2 -fPIC -Wall -Werror
 CFLAGS	+= $(shell pkg-config --cflags --libs libudev)
 CFLAGS	+= $(shell pkg-config --cflags --libs libnotify)
+LDFLAGS	+= -Wl,-z,now -Wl,-z,relro -pie
+
 # this is just a fallback in case you do not use git but downloaded
 # a release tarball...
 VERSION := 0.7.9
@@ -15,7 +20,7 @@ VERSION := 0.7.9
 all: udev-block-notify README.html
 
 udev-block-notify: udev-block-notify.c config.h version.h
-	$(CC) $(CFLAGS) -o udev-block-notify udev-block-notify.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o udev-block-notify udev-block-notify.c
 
 config.h: config.def.h
 	$(CP) config.def.h config.h
