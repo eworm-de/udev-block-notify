@@ -19,6 +19,7 @@ Requirements
 
 To compile and run `udev-block-notify` you need:
 
+* [systemd](https://www.github.com/systemd/systemd)
 * [libnotify](http://library.gnome.org/devel/notification-spec/)
 * [systemd](http://www.freedesktop.org/wiki/Software/systemd) (or `udev` which has been merge into `systemd`)
 * [markdown](http://daringfireball.net/projects/markdown/) (HTML documentation)

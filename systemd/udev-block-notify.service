@@ -2,7 +2,7 @@
 Description=Udev Block Notification
 
 [Service]
-Type=simple
+Type=notify
 ExecStart=/usr/bin/udev-block-notify
 
 [Install]

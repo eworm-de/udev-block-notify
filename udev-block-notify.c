@@ -135,6 +135,10 @@ int main (int argc, char ** argv) {
 	notifications->notification = NULL;
 	notifications->next = NULL;
 
+#ifdef HAVE_SYSTEMD
+	sd_notify(0, "READY=1\nSTATUS=Waiting for udev block events...");
+#endif
+
 	while (1) {
 		FD_ZERO(&readfds);
 		if (mon != NULL)
