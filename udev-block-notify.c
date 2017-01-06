@@ -307,6 +307,16 @@ int main (int argc, char ** argv) {
 		}
 	}
 
+	/* report stopping to systemd */
+#ifdef HAVE_SYSTEMD
+	sd_notify(0, "STOPPING=1\nSTATUS=Stopping...");
+#endif
+
 	udev_unref(udev);
+
+#ifdef HAVE_SYSTEMD
+	sd_notify(0, "STATUS=Stopped. Bye!");
+#endif
+
 	return EXIT_SUCCESS;
 }
