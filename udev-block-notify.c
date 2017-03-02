@@ -107,7 +107,11 @@ int main (int argc, char ** argv) {
 	}
 
 	if (verbose > 0)
-		printf("%s: %s v%s (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
+		printf("%s: %s v%s"
+#ifdef HAVE_SYSTEMD
+			" +systemd"
+#endif
+			" (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
 
 	if (help > 0)
 		printf("usage: %s [-h] [-t TIMEOUT] [-v] [-V]\n", argv[0]);
