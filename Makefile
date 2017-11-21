@@ -30,9 +30,7 @@ config.h: config.def.h
 	$(CP) config.def.h config.h
 
 version.h: $(wildcard .git/HEAD .git/index .git/refs/tags/*) Makefile
-	echo "#ifndef VERSION" > $@
-	echo "#define VERSION \"$(shell git describe --long 2>/dev/null || echo ${VERSION})\"" >> $@
-	echo "#endif" >> $@
+	printf "#ifndef VERSION\n#define VERSION \"%s\"\n#endif\n" $(shell git describe --long 2>/dev/null || echo ${VERSION}) > $@
 
 README.html: README.md
 	$(MD) README.md > README.html
