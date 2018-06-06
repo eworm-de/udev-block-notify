@@ -56,3 +56,4 @@ distclean:
 release:
 	git archive --format=tar.xz --prefix=udev-block-notify-$(VERSION)/ $(VERSION) > udev-block-notify-$(VERSION).tar.xz
 	gpg -ab udev-block-notify-$(VERSION).tar.xz
+	git notes --ref=refs/notes/signatures/tar add -C $$(git archive --format=tar --prefix=udev-block-notify-$(VERSION)/ $(VERSION) | gpg --armor --detach-sign | git hash-object -w --stdin) $(VERSION)
