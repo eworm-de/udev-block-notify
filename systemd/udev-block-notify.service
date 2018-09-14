@@ -1,5 +1,6 @@
 [Unit]
 Description=Udev Block Notification
+ConditionUser=!@system
 
 [Service]
 Type=notify
