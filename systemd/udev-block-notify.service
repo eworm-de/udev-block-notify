@@ -1,5 +1,6 @@
 [Unit]
 Description=Udev Block Notification
+Requires=dbus.socket
 ConditionUser=!@system
 
 [Service]
