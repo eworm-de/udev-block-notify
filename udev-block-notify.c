@@ -21,6 +21,7 @@ const static struct option options_long[] = {
 
 char *program;
 uint8_t verbose = 0;
+uint8_t doexit = 0;
 
 /*** get_notification ***/
 NotifyNotification * get_notification(struct notifications *notifications, dev_t devnum) {
@@ -66,6 +67,14 @@ char * appendstr(const char *text, char *notifystr, const char *property, const 
 	sprintf(notifystr + strlen(notifystr), text, property, value);
 
 	return notifystr;
+}
+
+/*** received_signal ***/
+void received_signal(int signal) {
+	if (verbose > 0)
+		printf("%s: Received signal: %s\n", program, strsignal(signal));
+
+	doexit++;
 }
 
 /*** main ***/
@@ -142,11 +151,14 @@ int main (int argc, char ** argv) {
 	notifications->notification = NULL;
 	notifications->next = NULL;
 
+	signal(SIGINT, received_signal);
+	signal(SIGTERM, received_signal);
+
 #ifdef HAVE_SYSTEMD
 	sd_notify(0, "READY=1\nSTATUS=Waiting for udev block events...");
 #endif
 
-	while (1) {
+	while (doexit == 0) {
 		FD_ZERO(&readfds);
 		if (mon != NULL)
 			FD_SET(udev_monitor_get_fd(mon), &readfds);
@@ -283,7 +295,7 @@ int main (int argc, char ** argv) {
 				notify_notification_set_timeout(notification, notification_timeout);
 
 				while(notify_notification_show(notification, &error) == FALSE) {
-					if (errcount > 1) {
+					if (errcount > 1 || doexit) {
 						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", program);
 						exit(EXIT_FAILURE);
 					} else {

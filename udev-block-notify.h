@@ -45,6 +45,9 @@ char * newstr(const char *text, const char *device, unsigned short int major,
 char * appendstr(const char *text, char *notifystr, const char *property,
 		const char *value);
 
+/*** received_signal ***/
+void received_signal(int signal);
+
 /*** main ***/
 int main (int argc, char ** argv);
 
