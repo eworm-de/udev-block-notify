@@ -19,6 +19,7 @@ const static struct option options_long[] = {
 	{ 0, 0, 0, 0 }
 };
 
+char *program;
 uint8_t verbose = 0;
 
 /*** get_notification ***/
@@ -87,6 +88,8 @@ int main (int argc, char ** argv) {
 
 	unsigned int version = 0, help = 0;
 
+	program = argv[0];
+
 	/* get the verbose status */
 	while ((i = getopt_long(argc, argv, optstring, options_long, NULL)) != -1) {
 		switch (i) {
@@ -111,21 +114,21 @@ int main (int argc, char ** argv) {
 #ifdef HAVE_SYSTEMD
 			" +systemd"
 #endif
-			" (compiled: " __DATE__ ", " __TIME__ ")\n", argv[0], PROGNAME, VERSION);
+			" (compiled: " __DATE__ ", " __TIME__ ")\n", program, PROGNAME, VERSION);
 
 	if (help > 0)
-		printf("usage: %s [-h] [-t TIMEOUT] [-v] [-V]\n", argv[0]);
+		printf("usage: %s [-h] [-t TIMEOUT] [-v] [-V]\n", program);
 
 	if (version > 0 || help > 0)
 		return EXIT_SUCCESS;
 
 	if(notify_init("Udev-Block-Notification") == FALSE) {
-		fprintf(stderr, "%s: Can't create notify.\n", argv[0]);
+		fprintf(stderr, "%s: Can't create notify.\n", program);
 		exit(EXIT_FAILURE);
 	}
 
 	if ((udev = udev_new()) == NULL) {
-		fprintf(stderr, "%s: Can't create udev.\n", argv[0]);
+		fprintf(stderr, "%s: Can't create udev.\n", program);
 		exit(EXIT_FAILURE);
 	}
 
@@ -162,13 +165,13 @@ int main (int argc, char ** argv) {
 
 					if (udev_device_get_property_value(dev, "DM_NAME") == NULL) {
 						if (verbose > 0)
-							printf("%s: Skipping temporary DM device %s\n", argv[0], device);
+							printf("%s: Skipping temporary DM device %s\n", program, device);
 						continue;
 					}
 					if ((property = udev_device_get_property_value(dev, "DM_LV_LAYER")) != NULL) {
 						if (strcmp(property, "cow") == 0 || strcmp(property, "real") == 0) {
 							if (verbose > 0)
-								printf("%s: Skipping DM %s device %s\n", argv[0], property, device);
+								printf("%s: Skipping DM %s device %s\n", program, property, device);
 							continue;
 						}
 					}
@@ -179,7 +182,7 @@ int main (int argc, char ** argv) {
 				minor = minor(devnum);
 
 				if (verbose > 0)
-					printf("%s: Processing device %d:%d\n", argv[0], major, minor);
+					printf("%s: Processing device %d:%d\n", program, major, minor);
 
 				action = udev_device_get_action(dev);
 				if (strcmp(action, "add") == 0)
@@ -225,7 +228,7 @@ int main (int argc, char ** argv) {
 					notifystr = appendstr(TEXT_TAG, notifystr, "Multi disk level", value);
 
 				if (verbose > 0)
-					printf("%s: %s\n", argv[0], notifystr);
+					printf("%s: %s\n", program, notifystr);
 
 				/* get a notification */
 				notification = get_notification(notifications, devnum);
@@ -281,10 +284,10 @@ int main (int argc, char ** argv) {
 
 				while(notify_notification_show(notification, &error) == FALSE) {
 					if (errcount > 1) {
-						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", argv[0]);
+						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", program);
 						exit(EXIT_FAILURE);
 					} else {
-						g_printerr("%s: Error \"%s\" while trying to show notification. Trying to reconnect.\n", argv[0], error->message);
+						g_printerr("%s: Error \"%s\" while trying to show notification. Trying to reconnect.\n", program, error->message);
 						errcount++;
 
 						g_error_free(error);
@@ -295,7 +298,7 @@ int main (int argc, char ** argv) {
 						usleep(500 * 1000);
 
 						if(notify_init("Udev-Block-Notification") == FALSE) {
-							fprintf(stderr, "%s: Can't create notify.\n", argv[0]);
+							fprintf(stderr, "%s: Can't create notify.\n", program);
 							exit(EXIT_FAILURE);
 						}
 					}
