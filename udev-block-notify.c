@@ -88,7 +88,7 @@ int main (int argc, char ** argv) {
 	struct notifications *notifications = NULL;
 	unsigned int notification_timeout = NOTIFICATION_TIMEOUT;
 
-	int errcount = 0, i;
+	int i;
 	dev_t devnum = 0;
 	unsigned int major = 0, minor = 0;
 	struct udev_device *dev = NULL;
@@ -295,27 +295,11 @@ int main (int argc, char ** argv) {
 				notify_notification_set_timeout(notification, notification_timeout);
 
 				while(notify_notification_show(notification, &error) == FALSE) {
-					if (errcount > 1 || doexit) {
-						fprintf(stderr, "%s: Looks like we can not reconnect to notification daemon... Exiting.\n", program);
-						exit(EXIT_FAILURE);
-					} else {
-						g_printerr("%s: Error \"%s\" while trying to show notification. Trying to reconnect.\n", program, error->message);
-						errcount++;
+					g_printerr("%s: Error showing notification: %s\n", program, error->message);
+					g_error_free(error);
 
-						g_error_free(error);
-						error = NULL;
-
-						notify_uninit();
-
-						usleep(500 * 1000);
-
-						if(notify_init("Udev-Block-Notification") == FALSE) {
-							fprintf(stderr, "%s: Can't create notify.\n", program);
-							exit(EXIT_FAILURE);
-						}
-					}
+					exit(EXIT_FAILURE);
 				}
-				errcount = 0;
 
 				free(notifystr);
 				udev_device_unref(dev);
