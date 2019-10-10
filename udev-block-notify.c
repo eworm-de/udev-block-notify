@@ -294,7 +294,7 @@ int main (int argc, char ** argv) {
 				notify_notification_update(notification, TEXT_TOPIC, notifystr, icon);
 				notify_notification_set_timeout(notification, notification_timeout);
 
-				while(notify_notification_show(notification, &error) == FALSE) {
+				if (notify_notification_show(notification, &error) == FALSE) {
 					g_printerr("%s: Error showing notification: %s\n", program, error->message);
 					g_error_free(error);
 
