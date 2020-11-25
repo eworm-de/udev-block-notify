@@ -26,7 +26,7 @@ all: udev-block-notify README.html
 udev-block-notify: udev-block-notify.c config.h version.h
 	$(CC) udev-block-notify.c $(CFLAGS) $(LDFLAGS) -o udev-block-notify
 
-config.h: config.def.h
+config.h:
 	$(CP) config.def.h config.h
 
 version.h: $(wildcard .git/HEAD .git/index .git/refs/tags/*) Makefile
