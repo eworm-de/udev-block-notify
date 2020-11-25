@@ -24,7 +24,7 @@ VERSION := 0.7.10
 all: udev-block-notify README.html
 
 udev-block-notify: udev-block-notify.c config.h version.h
-	$(CC) $(CFLAGS) $(LDFLAGS) -o udev-block-notify udev-block-notify.c
+	$(CC) udev-block-notify.c $(CFLAGS) $(LDFLAGS) -o udev-block-notify
 
 config.h: config.def.h
 	$(CP) config.def.h config.h
