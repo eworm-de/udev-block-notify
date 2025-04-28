@@ -70,3 +70,6 @@ URL:
 Mirror:
 [eworm.de](https://git.eworm.de/cgit.cgi/udev-block-notify/)
 [GitLab.com](https://gitlab.com/eworm-de/udev-block-notify#udev-block-notify)
+
+---
+[⬆️ Go back to top](#top)
