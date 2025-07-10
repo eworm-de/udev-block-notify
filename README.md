@@ -1,6 +1,10 @@
 udev-block-notify
 =================
 
+[![GitHub stars](https://img.shields.io/github/stars/eworm-de/udev-block-notify?logo=GitHub&style=flat&color=red)](https://github.com/eworm-de/udev-block-notify/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/eworm-de/udev-block-notify?logo=GitHub&style=flat&color=green)](https://github.com/eworm-de/udev-block-notify/network)
+[![GitHub watchers](https://img.shields.io/github/watchers/eworm-de/udev-block-notify?logo=GitHub&style=flat&color=blue)](https://github.com/eworm-de/udev-block-notify/watchers)
+
 **Notify about udev block events**
 
 This runs in background and produces notifications whenever udev (or systemd)
