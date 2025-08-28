@@ -19,7 +19,8 @@ LDFLAGS	+= -Wl,-z,now -Wl,-z,relro -pie
 
 # this is just a fallback in case you do not use git but downloaded
 # a release tarball...
-VERSION := 0.7.11
+DISTVER := 0.7.11
+VERSION ?= $(shell git describe --long 2>/dev/null || echo $(DISTVER))
 
 all: udev-block-notify README.html
 
@@ -54,6 +55,6 @@ distclean:
 	$(RM) -f *.o *~ README.html udev-block-notify config.h version.h
 
 release:
-	git archive --format=tar.xz --prefix=udev-block-notify-$(VERSION)/ $(VERSION) > udev-block-notify-$(VERSION).tar.xz
-	gpg --armor --detach-sign --comment udev-block-notify-$(VERSION).tar.xz udev-block-notify-$(VERSION).tar.xz
-	git notes --ref=refs/notes/signatures/tar add -C $$(git archive --format=tar --prefix=udev-block-notify-$(VERSION)/ $(VERSION) | gpg --armor --detach-sign --comment udev-block-notify-$(VERSION).tar | git hash-object -w --stdin) $(VERSION)
+	git archive --format=tar.xz --prefix=udev-block-notify-$(DISTVER)/ $(DISTVER) > udev-block-notify-$(DISTVER).tar.xz
+	gpg --armor --detach-sign --comment udev-block-notify-$(DISTVER).tar.xz udev-block-notify-$(DISTVER).tar.xz
+	git notes --ref=refs/notes/signatures/tar add -C $$(git archive --format=tar --prefix=udev-block-notify-$(DISTVER)/ $(DISTVER) | gpg --armor --detach-sign --comment udev-block-notify-$(DISTVER).tar | git hash-object -w --stdin) $(DISTVER)
