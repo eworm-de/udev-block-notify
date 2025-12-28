@@ -36,10 +36,12 @@ version.h: $(wildcard .git/HEAD .git/index .git/refs/tags/*) Makefile
 README.html: README.md
 	$(MD) README.md > README.html
 
-install: install-bin install-doc
+install: install-bin install-doc install-units
 
 install-bin: udev-block-notify
 	$(INSTALL) -D -m0755 udev-block-notify $(DESTDIR)/usr/bin/udev-block-notify
+
+install-units:
 ifneq ($(CFLAGS_SYSTEMD),)
 	$(INSTALL) -D -m0644 systemd/udev-block-notify.service $(DESTDIR)/usr/lib/systemd/user/udev-block-notify.service
 endif
